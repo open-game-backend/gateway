@@ -2,8 +2,11 @@ package de.opengamebackend.gateway;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Payload;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -13,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
@@ -49,16 +53,20 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
 
         if (token != null) {
             // Parse the token.
-            String user = JWT.require(Algorithm.HMAC512(jwtConfig.getJwtSecret().getBytes()))
+            Payload payload = JWT.require(Algorithm.HMAC512(jwtConfig.getJwtSecret().getBytes()))
                     .build()
-                    .verify(token.replace(AUTHORIZATION_TOKEN_PREFIX, ""))
-                    .getSubject();
+                    .verify(token.replace(AUTHORIZATION_TOKEN_PREFIX, ""));
 
-            if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+            String playerId = payload.getSubject();
+            List<String> roles = payload.getClaim("roles").asList(String.class);
+
+            List<GrantedAuthority> authorities = new ArrayList<>();
+
+            for (String role : roles) {
+                authorities.add(new SimpleGrantedAuthority(role));
             }
 
-            return null;
+            return new UsernamePasswordAuthenticationToken(playerId, null, authorities);
         }
 
         return null;

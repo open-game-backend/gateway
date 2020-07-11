@@ -49,24 +49,33 @@ public class AuthLoginResponseFilter extends ZuulFilter {
             return null;
         }
 
-        try (InputStream in = context.getRequest().getInputStream()) {
-            String requestBody = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
+        try (final InputStream requestStream = context.getRequest().getInputStream()) {
+            try (final InputStream serviceResponseStream = context.getResponseDataStream()) {
+                ObjectMapper objectMapper = new ObjectMapper();
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            LoginRequest request = objectMapper.readValue(requestBody, LoginRequest.class);
+                String requestBody = StreamUtils.copyToString(requestStream, Charset.forName("UTF-8"));
+                LoginRequest request = objectMapper.readValue(requestBody, LoginRequest.class);
 
-            if (request == null) {
-                return null;
+                String serviceResponseBody = StreamUtils.copyToString(serviceResponseStream, Charset.forName("UTF-8"));
+                LoginServiceResponse serviceResponse = objectMapper.readValue
+                        (serviceResponseBody, LoginServiceResponse.class);
+
+                String[] roles = new String[serviceResponse.getRoles().size()];
+                serviceResponse.getRoles().toArray(roles);
+
+                String token = JWT.create()
+                        .withSubject(request.getPlayerId())
+                        .withArrayClaim("roles", roles)
+                        .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getJwtTokenExpirationTime()))
+                        .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
+                LoginResponse response = new LoginResponse(token);
+                String responseBody = objectMapper.writeValueAsString(response);
+
+                context.setResponseBody(responseBody);
+
+            } catch (IOException e) {
+                throw new ZuulException(e, 500, e.getMessage());
             }
-
-            String token = JWT.create()
-                    .withSubject(request.getPlayerId())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getJwtTokenExpirationTime()))
-                    .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
-            LoginResponse response = new LoginResponse(token);
-            String responseBody = objectMapper.writeValueAsString(response);
-
-            context.setResponseBody(responseBody);
         } catch (IOException e) {
             throw new ZuulException(e, 500, e.getMessage());
         }

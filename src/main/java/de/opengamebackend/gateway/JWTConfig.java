@@ -14,7 +14,7 @@ public class JWTConfig {
     private String jwtSecret;
 
     @PostConstruct
-    public void init() {
+    public void postConstruct() {
         if (Strings.isNullOrEmpty(jwtSecret)) {
             throw new IllegalArgumentException("Property 'de.opengamebackend.gateway.jwtSecret' not set.");
         }
