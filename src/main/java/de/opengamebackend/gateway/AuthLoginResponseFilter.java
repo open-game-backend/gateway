@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
@@ -53,10 +54,10 @@ public class AuthLoginResponseFilter extends ZuulFilter {
             try (final InputStream serviceResponseStream = context.getResponseDataStream()) {
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                String requestBody = StreamUtils.copyToString(requestStream, Charset.forName("UTF-8"));
+                String requestBody = StreamUtils.copyToString(requestStream, StandardCharsets.UTF_8);
                 LoginRequest request = objectMapper.readValue(requestBody, LoginRequest.class);
 
-                String serviceResponseBody = StreamUtils.copyToString(serviceResponseStream, Charset.forName("UTF-8"));
+                String serviceResponseBody = StreamUtils.copyToString(serviceResponseStream, StandardCharsets.UTF_8);
                 LoginServiceResponse serviceResponse = objectMapper.readValue
                         (serviceResponseBody, LoginServiceResponse.class);
 
