@@ -14,8 +14,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
     private JWTConfig jwtConfig;
+
+    @Autowired
+    public WebSecurityConfig(JWTConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,8 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthLoginResponseFilter authLoginResponseFilter() {
-        return new AuthLoginResponseFilter();
+    public AuthLoginResponseFilter authLoginResponseFilter(JWTConfig jwtConfig) {
+        return new AuthLoginResponseFilter(jwtConfig);
     }
 
     @Bean

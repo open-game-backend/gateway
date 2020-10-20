@@ -11,15 +11,18 @@ import org.springframework.util.StreamUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthLoginResponseFilter extends ZuulFilter {
-    @Autowired
     private JWTConfig jwtConfig;
+
+    @Autowired
+    public AuthLoginResponseFilter(JWTConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
 
     @Override
     public String filterType() {
