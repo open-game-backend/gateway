@@ -92,10 +92,18 @@
 		</resources>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages (util)</name>
+			<url>https://maven.pkg.github.com/open-game-backend/util</url>
+		</repository>
+	</repositories>
+
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
+            <name>GitHub Packages (gateway)</name>
             <url>https://maven.pkg.github.com/open-game-backend/gateway</url>
         </repository>
     </distributionManagement>
