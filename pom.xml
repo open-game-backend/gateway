@@ -51,6 +51,11 @@
 			<artifactId>util</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>de.opengamebackend</groupId>
+			<artifactId>net</artifactId>
+			<version>0.0.8-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -94,7 +99,12 @@
 
 	<repositories>
 		<repository>
-			<id>github</id>
+			<id>github-net</id>
+			<name>GitHub Packages (net)</name>
+			<url>https://maven.pkg.github.com/open-game-backend/net</url>
+		</repository>
+		<repository>
+			<id>github-util</id>
 			<name>GitHub Packages (util)</name>
 			<url>https://maven.pkg.github.com/open-game-backend/util</url>
 		</repository>

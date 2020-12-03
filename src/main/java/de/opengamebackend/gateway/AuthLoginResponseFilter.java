@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import de.opengamebackend.auth.model.requests.LoginRequest;
+import de.opengamebackend.auth.model.responses.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
 
@@ -53,33 +55,29 @@ public class AuthLoginResponseFilter extends ZuulFilter {
             return null;
         }
 
-        try (final InputStream requestStream = context.getRequest().getInputStream()) {
-            try (final InputStream serviceResponseStream = context.getResponseDataStream()) {
-                ObjectMapper objectMapper = new ObjectMapper();
+        try (final InputStream serviceResponseStream = context.getResponseDataStream()) {
+            ObjectMapper objectMapper = new ObjectMapper();
 
-                String requestBody = StreamUtils.copyToString(requestStream, StandardCharsets.UTF_8);
-                LoginRequest request = objectMapper.readValue(requestBody, LoginRequest.class);
+            String serviceResponseBody = StreamUtils.copyToString(serviceResponseStream, StandardCharsets.UTF_8);
+            LoginResponse response = objectMapper.readValue(serviceResponseBody, LoginResponse.class);
 
-                String serviceResponseBody = StreamUtils.copyToString(serviceResponseStream, StandardCharsets.UTF_8);
-                LoginServiceResponse serviceResponse = objectMapper.readValue
-                        (serviceResponseBody, LoginServiceResponse.class);
+            String[] roles = new String[response.getRoles().size()];
+            response.getRoles().toArray(roles);
 
-                String[] roles = new String[serviceResponse.getRoles().size()];
-                serviceResponse.getRoles().toArray(roles);
+            String token = JWT.create()
+                    .withSubject(response.getPlayerId())
+                    .withArrayClaim("roles", roles)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getJwtTokenExpirationTime()))
+                    .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
 
-                String token = JWT.create()
-                        .withSubject(request.getPlayerId())
-                        .withArrayClaim("roles", roles)
-                        .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getJwtTokenExpirationTime()))
-                        .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
-                LoginResponse response = new LoginResponse(token);
-                String responseBody = objectMapper.writeValueAsString(response);
+            AuthTokenResponse gatewayResponse = new AuthTokenResponse(response.isLocked() ? "" : token);
+            gatewayResponse.setLocked(response.isLocked());
+            gatewayResponse.setFirstTimeSetup(response.isFirstTimeSetup());
 
-                context.setResponseBody(responseBody);
+            String responseBody = objectMapper.writeValueAsString(gatewayResponse);
 
-            } catch (IOException e) {
-                throw new ZuulException(e, 500, e.getMessage());
-            }
+            context.setResponseBody(responseBody);
+
         } catch (IOException e) {
             throw new ZuulException(e, 500, e.getMessage());
         }
