@@ -71,6 +71,8 @@ public class AuthLoginResponseFilter extends ZuulFilter {
                     .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
 
             AuthTokenResponse gatewayResponse = new AuthTokenResponse(response.isLocked() ? "" : token);
+            gatewayResponse.setUserId(response.getPlayerId());
+            gatewayResponse.setProvider(response.getProvider());
             gatewayResponse.setLocked(response.isLocked());
             gatewayResponse.setFirstTimeSetup(response.isFirstTimeSetup());
 
