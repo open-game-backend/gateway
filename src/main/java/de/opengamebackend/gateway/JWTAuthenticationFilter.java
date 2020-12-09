@@ -22,12 +22,12 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
 
-    private final JWTConfig jwtConfig;
+    private final GatewayConfig gatewayConfig;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTConfig jwtConfig) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, GatewayConfig gatewayConfig) {
         super(authenticationManager);
 
-        this.jwtConfig = jwtConfig;
+        this.gatewayConfig = gatewayConfig;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
 
         if (token != null) {
             // Parse the token.
-            Payload payload = JWT.require(Algorithm.HMAC512(jwtConfig.getJwtSecret().getBytes()))
+            Payload payload = JWT.require(Algorithm.HMAC512(gatewayConfig.getJwtSecret().getBytes()))
                     .build()
                     .verify(token.replace(AUTHORIZATION_TOKEN_PREFIX, ""));
 

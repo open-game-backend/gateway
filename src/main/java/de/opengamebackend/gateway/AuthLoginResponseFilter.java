@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import de.opengamebackend.auth.model.requests.LoginRequest;
 import de.opengamebackend.auth.model.responses.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
@@ -19,11 +18,11 @@ import java.util.Date;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthLoginResponseFilter extends ZuulFilter {
-    private JWTConfig jwtConfig;
+    private GatewayConfig gatewayConfig;
 
     @Autowired
-    public AuthLoginResponseFilter(JWTConfig jwtConfig) {
-        this.jwtConfig = jwtConfig;
+    public AuthLoginResponseFilter(GatewayConfig gatewayConfig) {
+        this.gatewayConfig = gatewayConfig;
     }
 
     @Override
@@ -67,8 +66,8 @@ public class AuthLoginResponseFilter extends ZuulFilter {
             String token = JWT.create()
                     .withSubject(response.getPlayerId())
                     .withArrayClaim("roles", roles)
-                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getJwtTokenExpirationTime()))
-                    .sign(HMAC512(jwtConfig.getJwtSecret().getBytes()));
+                    .withExpiresAt(new Date(System.currentTimeMillis() + gatewayConfig.getJwtTokenExpirationTime()))
+                    .sign(HMAC512(gatewayConfig.getJwtSecret().getBytes()));
 
             AuthTokenResponse gatewayResponse = new AuthTokenResponse(response.isLocked() ? "" : token);
             gatewayResponse.setUserId(response.getPlayerId());

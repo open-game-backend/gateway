@@ -2,22 +2,23 @@ package de.opengamebackend.gateway;
 
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
-@Component
-public class JWTConfig {
+@ConstructorBinding
+@ConfigurationProperties("de.opengamebackend.gateway")
+public class GatewayConfig {
     private static final long TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
-    @Value("${de.opengamebackend.gateway.jwtSecret}")
+    @NotNull
     private String jwtSecret;
 
-    @PostConstruct
-    public void postConstruct() {
-        if (Strings.isNullOrEmpty(jwtSecret)) {
-            throw new IllegalArgumentException("Property 'de.opengamebackend.gateway.jwtSecret' not set.");
-        }
+    public GatewayConfig(String jwtSecret) {
+        this.jwtSecret = jwtSecret;
     }
 
     public String getJwtSecret() {

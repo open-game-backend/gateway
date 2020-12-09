@@ -14,11 +14,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private JWTConfig jwtConfig;
+    private GatewayConfig gatewayConfig;
 
     @Autowired
-    public WebSecurityConfig(JWTConfig jwtConfig) {
-        this.jwtConfig = jwtConfig;
+    public WebSecurityConfig(GatewayConfig gatewayConfig) {
+        this.gatewayConfig = gatewayConfig;
     }
 
     @Override
@@ -41,18 +41,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Require token for all other requests.
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), gatewayConfig))
                 // Disable session creation on Spring Security.
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
-    public AuthLoginResponseFilter authLoginResponseFilter(JWTConfig jwtConfig) {
-        return new AuthLoginResponseFilter(jwtConfig);
+    public AuthLoginResponseFilter authLoginResponseFilter(GatewayConfig gatewayConfig) {
+        return new AuthLoginResponseFilter(gatewayConfig);
     }
-
-    @Bean
-    public JWTConfig jwtConfig() { return new JWTConfig(); }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
