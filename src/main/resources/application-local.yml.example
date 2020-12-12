@@ -1,0 +1,11 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone:
+  instance:
+    hostname:
+
+de:
+  opengamebackend:
+    gateway:
+      jwtSecret:

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: open-game-backend-gateway
+
+server:
+  port: 9000
+
+de:
+  opengamebackend:
+    application:
+      version: @project.version@
