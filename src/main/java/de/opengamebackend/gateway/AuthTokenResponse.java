@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class AuthTokenResponse {
     private String token;
-    private String userId;
     private String provider;
+    private String providerUserId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean locked;
@@ -25,20 +25,20 @@ public class AuthTokenResponse {
         this.token = token;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getProvider() {
         return provider;
     }
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    public String getProviderUserId() {
+        return providerUserId;
+    }
+
+    public void setProviderUserId(String providerUserId) {
+        this.providerUserId = providerUserId;
     }
 
     public boolean isLocked() {

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>de.opengamebackend</groupId>
 	<artifactId>gateway</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<name>gateway</name>
 	<description>API gateway for all Open Game Backend services.</description>
 
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>de.opengamebackend</groupId>
 			<artifactId>net</artifactId>
-			<version>0.0.9-SNAPSHOT</version>
+			<version>0.0.10-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
