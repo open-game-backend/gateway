@@ -21,6 +21,7 @@ import java.util.List;
 public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
+    public static final String PLAYER_ID_HEADER_NAME = "Player-Id";
 
     private final GatewayConfig gatewayConfig;
 
@@ -45,7 +46,15 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
         UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(req, res);
+
+        // Add player id header.
+        MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(req);
+
+        if (authentication != null) {
+            mutableRequest.setHeader(PLAYER_ID_HEADER_NAME, authentication.getPrincipal().toString());
+        }
+
+        chain.doFilter(mutableRequest, res);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
