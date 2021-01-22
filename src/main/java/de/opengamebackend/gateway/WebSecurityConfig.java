@@ -32,12 +32,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // Enable authorization.
                 .authorizeRequests()
-                // Allow register and login without token.
-                .antMatchers("/open-game-backend-auth/register", "/open-game-backend-auth/login").permitAll()
+                // Allow login without token.
+                .antMatchers("/open-game-backend-auth/login").permitAll()
                 // Restrict admin endpoints.
-                .antMatchers("/open-game-backend-matchmaking/queue").hasRole("ADMIN")
+                .antMatchers("**/admin/**").hasRole("ADMIN")
                 // Hide server endpoints.
-                .antMatchers("/open-game-backend-matchmaking/server/**").denyAll()
+                .antMatchers("**/server/**").denyAll()
                 // Require token for all other requests.
                 .anyRequest().authenticated()
                 .and()
