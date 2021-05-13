@@ -38,7 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Restrict admin endpoints.
                 .antMatchers("**/admin/**").hasRole("ADMIN")
                 // Hide server endpoints.
-                .antMatchers("**/server/**").denyAll()
+                .antMatchers("**/server/**").hasRole("SERVER")
                 // Require token for all other requests.
                 .anyRequest().authenticated()
                 .and()
